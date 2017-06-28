@@ -216,6 +216,7 @@ func SSHConfigPubKeyAgent(user string) (*ssh.ClientConfig, error) {
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeysCallback(agent.NewClient(c).Signers),
 		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}, nil
 }
 
