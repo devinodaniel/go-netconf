@@ -199,6 +199,31 @@ func SSHConfigPubKeyFile(user string, file string, passphrase string) (*ssh.Clie
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(key),
 		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}, nil
+
+}
+
+// SSHConfigPubKeyFile is a convenience function that takes a username, private key
+// and passphrase and returns a new ssh.ClientConfig setup to pass credentials
+// to DialSSH
+func SSHConfigPubKeyRaw(user string, rawPrivateKey string) (*ssh.ClientConfig, error) {
+	buf := []byte(rawPrivateKey)
+	_, rest := pem.Decode(buf)
+	if len(rest) > 0 {
+		return nil, fmt.Errorf("pem: unable to decode key")
+	}
+
+	key, err := ssh.ParsePrivateKey(buf)
+	if err != nil {
+		return nil, err
+	}
+	return &ssh.ClientConfig{
+		User: user,
+		Auth: []ssh.AuthMethod{
+			ssh.PublicKeys(key),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}, nil
 
 }
